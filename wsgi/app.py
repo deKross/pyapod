@@ -2,10 +2,8 @@ import os
 import re
 import urllib2
 
-from bottle import route, abort, redirect, run, default_app, TEMPLATE_PATH
+from bottle import route, abort, redirect, run, default_app
 
-
-TEMPLATE_PATH.append(os.path.join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/views/'))
 
 PATTERN = re.compile(r"<a href=\"image/(.*)\">")
 

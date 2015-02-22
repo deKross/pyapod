@@ -1,18 +1,19 @@
+import os
 import re
 import urllib2
-from bottle import route, abort, redirect, run, default_app
+
+from bottle import route, abort, redirect, run, default_app, TEMPLATE_PATH
 
 
-PATTERN = \
-    re.compile(r"<a href=\"image/(.*)\">")
+TEMPLATE_PATH.append(os.path.join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/views/'))
 
-DESCRIPTION = None
+PATTERN = re.compile(r"<a href=\"image/(.*)\">")
+
+application = default_app()
 
 
 @route('/')
 def index():
-    DESCRIPTION = None
-
     try:
         page = urllib2.urlopen('http://apod.nasa.gov/apod/').read()
     except Exception:
@@ -24,18 +25,6 @@ def index():
 
     url = 'http://apod.nasa.gov/apod/image/' + image.group(1)
     raise redirect(url)
-
-
-@route('/description')
-def description():
-    return DESCRIPTION or "Nothing"
-
-
-import os
-from bottle import TEMPLATE_PATH
-TEMPLATE_PATH.append(os.path.join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/views/'))
-
-application=default_app()
 
 
 if __name__ == '__main__':

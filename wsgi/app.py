@@ -1,6 +1,6 @@
 import re
 import urllib2
-from bottle import route, abort, redirect, run
+from bottle import route, abort, redirect, run, default_app
 
 
 PATTERN = \
@@ -29,6 +29,13 @@ def index():
 @route('/description')
 def description():
     return DESCRIPTION or "Nothing"
+
+
+import os
+from bottle import TEMPLATE_PATH
+TEMPLATE_PATH.append(os.path.join(os.environ['OPENSHIFT_REPO_DIR'], 'wsgi/views/'))
+
+application=default_app()
 
 
 if __name__ == '__main__':

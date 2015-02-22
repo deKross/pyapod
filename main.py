@@ -1,29 +1,35 @@
 import re
 import urllib2
-import cherrypy
+from bottle import route, abort, redirect, run
 
-PATTERN = re.compile(r"<a href=\"image/(.*)\">")
-class APODFetcher(object):
-    @cherrypy.expose
-    def index(self):
-        self.image_description = None
 
-        try:
-            page = urllib2.urlopen('http://apod.nasa.gov/apod/').read()
-        except Exception:
-            raise cherrypy.HTTPError(message='Cannot open url')
+PATTERN = \
+    re.compile(r"<a href=\"image/(.*)\">")
 
-        image = re.search(PATTERN, page)
-        if image is None:
-            raise cherrypy.HTTPError(message='Cannot fetch image')
+DESCRIPTION = None
 
-        cherrypy.response.headers['Content-Type']= 'image/jpg'
-        url = 'http://apod.nasa.gov/apod/image/' + image.group(1)
-        raise cherrypy.HTTPRedirect(url)
 
-    @cherrypy.expose
-    def description(self):
-        return getattr(self, 'image_description', "Nothing")
+@route('/')
+def index():
+    DESCRIPTION = None
+
+    try:
+        page = urllib2.urlopen('http://apod.nasa.gov/apod/').read()
+    except Exception:
+        raise abort(500, 'Cannot open url')
+
+    image = re.search(PATTERN, page)
+    if image is None:
+        raise abort(500, 'Cannot fetch image')
+
+    url = 'http://apod.nasa.gov/apod/image/' + image.group(1)
+    raise redirect(url)
+
+
+@route('/description')
+def description():
+    return DESCRIPTION or "Nothing"
+
 
 if __name__ == '__main__':
-    cherrypy.quickstart(APODFetcher(), )
+    run(host='localhost', port=8080)

@@ -19,7 +19,7 @@ def index():
 
     image = re.search(PATTERN, page)
     if image is None:
-        raise abort(500, 'Cannot fetch image')
+        raise abort(500, 'Cannot fetch image.\n' + page)
 
     url = 'http://apod.nasa.gov/apod/image/' + image.group(1)
     raise redirect(url)

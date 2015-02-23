@@ -14,8 +14,8 @@ application = default_app()
 def index():
     try:
         page = urllib2.urlopen('http://apod.nasa.gov/apod/').read()
-    except Exception:
-        raise abort(500, 'Cannot open url')
+    except Exception as e:
+        raise abort(500, 'Cannot open url.\n' + str(e))
 
     image = re.search(PATTERN, page)
     if image is None:

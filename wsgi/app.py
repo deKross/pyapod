@@ -5,7 +5,7 @@ import urllib2
 from bottle import route, abort, redirect, run, default_app
 
 
-PATTERN = re.compile(r"<a href=\"image/(.*)\">")
+PATTERN = re.compile(r"<a href=\"image/(.*)\"")
 
 application = default_app()
 
@@ -20,8 +20,13 @@ def index():
     image = re.search(PATTERN, page)
     if image is None:
         raise abort(500, 'Cannot fetch image.\n' + page)
+    image = image.group(1)
 
-    url = 'http://apod.nasa.gov/apod/image/' + image.group(1)
+    url = 'http://apod.nasa.gov/apod/image/' + image
+
+    if not image.endswith(('.jpg', '.png')):
+        raise abort(500, 'Not image.\n' + url)
+
     raise redirect(url)
 
 
